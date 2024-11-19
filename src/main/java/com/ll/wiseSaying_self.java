@@ -18,7 +18,6 @@ class AppSelf {
         Scanner scanner = new Scanner(System.in);
         List<WiseSayingCon> list = new ArrayList<>();
         int i = 1;
-        //String listContent;
 
         while(true) {
             System.out.print("명령) ");
@@ -39,7 +38,6 @@ class AppSelf {
                 i++;
             } else if(cmd.equals("목록")) {
                 for(int j = list.size() - 1; j >= 0; j--){
-                    //listContent = list.get(j);
                     System.out.println(list.get(j).id + " / " + list.get(j).writer + " / " + list.get(j).wiseSaying);
                 }
             }
