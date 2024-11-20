@@ -16,8 +16,8 @@ class AppSelf {
     public void run() {
         System.out.println("=== 명언 앱 ===");
         Scanner scanner = new Scanner(System.in);
-        List<WiseSayingCon> list = new ArrayList<>();
-        int i = 1;
+        List<WiseSaying> list = new ArrayList<>();
+        int id = 1;
 
         while(true) {
             System.out.print("명령) ");
@@ -27,31 +27,31 @@ class AppSelf {
             if(cmd.equals("종료")) break;
             else if(cmd.equals("등록")) {
                 System.out.print("명언 : ");
-                String wiseSaying = scanner.nextLine();
+                String content = scanner.nextLine();
 
                 System.out.print("작가 : ");
-                String writer = scanner.nextLine();
+                String author = scanner.nextLine();
 
-                list.add(new WiseSayingCon(i, wiseSaying, writer));
+                list.add(new WiseSaying(id, content, author));
 
-                System.out.println(i + "번 명언이 등록되었습니다.");
-                i++;
+                System.out.println(id + "번 명언이 등록되었습니다.");
+                id++;
             } else if(cmd.equals("목록")) {
-                for(int j = list.size() - 1; j >= 0; j--){
-                    System.out.println(list.get(j).id + " / " + list.get(j).writer + " / " + list.get(j).wiseSaying);
+                for(int i = list.size() - 1; i >= 0; i--){
+                    System.out.println("%d / %s / %s".formatted(list.get(i).id, list.get(i).author, list.get(i).content));
                 }
             }
         }
     }
 }
-class WiseSayingCon {
+class WiseSaying {
     int id;
-    String wiseSaying;
-    String writer;
+    String content;
+    String author;
 
-    WiseSayingCon(int id, String wiseSaying, String writer) {
+    WiseSaying(int id, String content, String author) {
         this.id = id;
-        this.wiseSaying = wiseSaying;
-        this.writer = writer;
+        this.content = content;
+        this.author = author;
     }
 }
