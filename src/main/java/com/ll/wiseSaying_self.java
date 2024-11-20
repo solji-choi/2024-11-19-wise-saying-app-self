@@ -40,6 +40,17 @@ class AppSelf {
                 for(int i = list.size() - 1; i >= 0; i--){
                     System.out.println("%d / %s / %s".formatted(list.get(i).id, list.get(i).author, list.get(i).content));
                 }
+            } else if(cmd.startsWith("삭제")) {
+                if(cmd.indexOf("?id=") > -1) {
+                    int getId =  Integer.parseInt(cmd.substring(cmd.indexOf("?id=") + 4));
+
+                    list.removeIf(wiseSaying -> wiseSaying.id == getId);
+                    System.out.println("%d번 명언이 삭제되었습니다.".formatted(getId));
+
+                } else {
+                    System.out.println("삭제할 명언의 id 값을 입력해주세요.");
+                }
+
             }
         }
     }
