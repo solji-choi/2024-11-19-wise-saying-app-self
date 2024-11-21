@@ -49,14 +49,14 @@ class AppSelf {
                 }
             } else if(cmd.startsWith("삭제")) {
                 try {
-                    delete(cmd, list);
+                    execute (cmd, list, "삭제", scanner);
                 } catch (WiseSayingException e) {
                     System.out.println(e.getMessage());
                 }
 
             } else if(cmd.startsWith("수정")) {
                 try {
-                    update(cmd, list, scanner);
+                    execute (cmd, list, "수정", scanner);
                 } catch (WiseSayingException e) {
                     System.out.println(e.getMessage());
                 }
@@ -65,7 +65,7 @@ class AppSelf {
         }
     }
 
-    void delete(String cmd, List<WiseSaying> list) throws WiseSayingException {
+    void execute (String cmd, List<WiseSaying> list, String command, Scanner scanner) throws WiseSayingException {
         if(cmd.indexOf("?id=") > -1) {
             int getId =  Integer.parseInt(cmd.substring(cmd.indexOf("?id=") + 4));
             boolean listChk = false;
@@ -79,46 +79,29 @@ class AppSelf {
             if(!listChk) {
                 throw new WiseSayingException("%d번 명언은 존재하지 않습니다.".formatted(getId));
             } else {
-                list.removeIf(wiseSaying -> wiseSaying.id == getId);
-                System.out.println("%d번 명언이 삭제되었습니다.".formatted(getId));
-            }
+                if(command.equals("삭제")) {
+                    list.removeIf(wiseSaying -> wiseSaying.id == getId);
+                    System.out.println("%d번 명언이 삭제되었습니다.".formatted(getId));
 
-        } else {
-            throw new WiseSayingException("삭제할 명언의 id 값을 입력해주세요.");
-        }
-    }
+                } else if (command.equals("수정")) {
+                    for(WiseSaying wiseSaying : list) {
+                        if (wiseSaying.id == getId) {
+                            System.out.println("명언(기존) : %s".formatted(wiseSaying.content));
+                            System.out.print("명언 : ");
+                            String content2 = scanner.nextLine();
+                            wiseSaying.setContent(content2);
 
-    void update(String cmd, List<WiseSaying> list, Scanner scanner) throws WiseSayingException {
-        if(cmd.indexOf("?id=") > -1) {
-            int getId =  Integer.parseInt(cmd.substring(cmd.indexOf("?id=") + 4));
-            boolean listChk = false;
-
-            for(WiseSaying wiseSaying : list) {
-                if (wiseSaying.id == getId) {
-                    listChk = true;
-                }
-            }
-
-            if(!listChk) {
-                throw new WiseSayingException("%d번 명언은 존재하지 않습니다.".formatted(getId));
-            } else {
-                for(WiseSaying wiseSaying : list) {
-                    if (wiseSaying.id == getId) {
-                        System.out.println("명언(기존) : %s".formatted(wiseSaying.content));
-                        System.out.print("명언 : ");
-                        String content2 = scanner.nextLine();
-                        wiseSaying.setContent(content2);
-
-                        System.out.println("작가(기존) : %s".formatted(wiseSaying.author));
-                        System.out.print("작가 : ");
-                        String author2 = scanner.nextLine();
-                        wiseSaying.setAuthor(author2);
+                            System.out.println("작가(기존) : %s".formatted(wiseSaying.author));
+                            System.out.print("작가 : ");
+                            String author2 = scanner.nextLine();
+                            wiseSaying.setAuthor(author2);
+                        }
                     }
                 }
             }
 
         } else {
-            throw new WiseSayingException("수정할 명언의 id 값을 입력해주세요.");
+            throw new WiseSayingException("%s할 명언의 id 값을 입력해주세요.".formatted(command));
         }
     }
 }
