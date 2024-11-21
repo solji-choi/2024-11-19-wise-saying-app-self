@@ -37,21 +37,42 @@ class AppSelf {
                 System.out.println(id + "번 명언이 등록되었습니다.");
                 id++;
             } else if(cmd.equals("목록")) {
+                System.out.println("번호 / 작가 / 명언");
+                System.out.println("----------------------");
                 for(int i = list.size() - 1; i >= 0; i--){
                     System.out.println("%d / %s / %s".formatted(list.get(i).id, list.get(i).author, list.get(i).content));
                 }
             } else if(cmd.startsWith("삭제")) {
-                if(cmd.indexOf("?id=") > -1) {
-                    int getId =  Integer.parseInt(cmd.substring(cmd.indexOf("?id=") + 4));
-
-                    list.removeIf(wiseSaying -> wiseSaying.id == getId);
-                    System.out.println("%d번 명언이 삭제되었습니다.".formatted(getId));
-
-                } else {
-                    System.out.println("삭제할 명언의 id 값을 입력해주세요.");
+                try {
+                    delete(cmd, list);
+                } catch (WiseSayingException e) {
+                    System.out.println(e.getMessage());
                 }
 
             }
+        }
+    }
+
+    void delete(String cmd, List<WiseSaying> list) throws WiseSayingException {
+        if(cmd.indexOf("?id=") > -1) {
+            int getId =  Integer.parseInt(cmd.substring(cmd.indexOf("?id=") + 4));
+            boolean listChk = false;
+
+            for(WiseSaying wiseSaying : list) {
+                if (wiseSaying.id == getId) {
+                    listChk = true;
+                }
+            }
+
+            if(!listChk) {
+                throw new WiseSayingException("%d번 명언은 존재하지 않습니다.".formatted(getId));
+            } else {
+                list.removeIf(wiseSaying -> wiseSaying.id == getId);
+                System.out.println("%d번 명언이 삭제되었습니다.".formatted(getId));
+            }
+
+        } else {
+            throw new WiseSayingException("삭제할 명언의 id 값을 입력해주세요.");
         }
     }
 }
@@ -64,5 +85,14 @@ class WiseSaying {
         this.id = id;
         this.content = content;
         this.author = author;
+    }
+}
+
+class WiseSayingException extends RuntimeException {
+    WiseSayingException(String msg) {
+        super(msg);
+    }
+    WiseSayingException(Exception ex) {
+        super(ex);
     }
 }
