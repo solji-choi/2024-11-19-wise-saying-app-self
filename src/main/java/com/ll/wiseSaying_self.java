@@ -39,12 +39,24 @@ class AppSelf {
             } else if(cmd.equals("목록")) {
                 System.out.println("번호 / 작가 / 명언");
                 System.out.println("----------------------");
-                for(int i = list.size() - 1; i >= 0; i--){
-                    System.out.println("%d / %s / %s".formatted(list.get(i).id, list.get(i).author, list.get(i).content));
+                
+                if(list.size() > 0) {
+                    for(int i = list.size() - 1; i >= 0; i--){
+                        System.out.println("%d / %s / %s".formatted(list.get(i).id, list.get(i).author, list.get(i).content));
+                    }
+                } else {
+                    System.out.println("목록이 없습니다");
                 }
             } else if(cmd.startsWith("삭제")) {
                 try {
                     delete(cmd, list);
+                } catch (WiseSayingException e) {
+                    System.out.println(e.getMessage());
+                }
+
+            } else if(cmd.startsWith("수정")) {
+                try {
+                    update(cmd, list, scanner);
                 } catch (WiseSayingException e) {
                     System.out.println(e.getMessage());
                 }
@@ -75,6 +87,40 @@ class AppSelf {
             throw new WiseSayingException("삭제할 명언의 id 값을 입력해주세요.");
         }
     }
+
+    void update(String cmd, List<WiseSaying> list, Scanner scanner) throws WiseSayingException {
+        if(cmd.indexOf("?id=") > -1) {
+            int getId =  Integer.parseInt(cmd.substring(cmd.indexOf("?id=") + 4));
+            boolean listChk = false;
+
+            for(WiseSaying wiseSaying : list) {
+                if (wiseSaying.id == getId) {
+                    listChk = true;
+                }
+            }
+
+            if(!listChk) {
+                throw new WiseSayingException("%d번 명언은 존재하지 않습니다.".formatted(getId));
+            } else {
+                for(WiseSaying wiseSaying : list) {
+                    if (wiseSaying.id == getId) {
+                        System.out.println("명언(기존) : %s".formatted(wiseSaying.content));
+                        System.out.print("명언 : ");
+                        String content2 = scanner.nextLine();
+                        wiseSaying.setContent(content2);
+
+                        System.out.println("작가(기존) : %s".formatted(wiseSaying.author));
+                        System.out.print("작가 : ");
+                        String author2 = scanner.nextLine();
+                        wiseSaying.setAuthor(author2);
+                    }
+                }
+            }
+
+        } else {
+            throw new WiseSayingException("수정할 명언의 id 값을 입력해주세요.");
+        }
+    }
 }
 class WiseSaying {
     int id;
@@ -84,6 +130,14 @@ class WiseSaying {
     WiseSaying(int id, String content, String author) {
         this.id = id;
         this.content = content;
+        this.author = author;
+    }
+
+    void setContent (String content) {
+        this.content = content;
+    }
+
+    void setAuthor (String author) {
         this.author = author;
     }
 }
