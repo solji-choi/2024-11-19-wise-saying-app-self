@@ -2,6 +2,9 @@ package com.ll;
 
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -36,6 +39,7 @@ class AppSelf {
 
                 list.add(new WiseSaying(id, content, author));
                 fileWrite (list, id);
+                fileWriteLastId(list, id);
 
                 System.out.println(id + "번 명언이 등록되었습니다.");
                 id++;
@@ -84,6 +88,9 @@ class AppSelf {
             } else {
                 if(command.equals("삭제")) {
                     list.removeIf(wiseSaying -> wiseSaying.id == getId);
+                    fileDelete(getId);
+                    fileWriteLastId(list, getId);
+
                     System.out.println("%d번 명언이 삭제되었습니다.".formatted(getId));
 
                 } else if (command.equals("수정")) {
@@ -100,6 +107,7 @@ class AppSelf {
                             wiseSaying.setAuthor(author2);
 
                             fileWrite (list, getId);
+                            fileWriteLastId(list, getId);
                         }
                     }
                 }
@@ -112,7 +120,6 @@ class AppSelf {
 
     void fileWrite (List<WiseSaying> list, int id) {
         FileOutputStream fos = null;
-        PrintWriter lastFos = null;
         byte[] fileWriteContent = null;
 
         for(WiseSaying wiseSaying : list) {
@@ -121,21 +128,45 @@ class AppSelf {
             }
         }
 
-
         try {
             fos = new FileOutputStream("db/wiseSaying/" + id + ".json");
-            lastFos = new PrintWriter("db/wiseSaying/lastId.txt");
             fos.write(fileWriteContent);
-            lastFos.println(list.get(list.size() - 1).id);
         } catch ( Exception e ) {
             System.out.println(e.getMessage());
         } finally {
             try {
                 fos.close();
+            } catch ( Exception e ) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    void fileWriteLastId (List<WiseSaying> list, int id) {
+        PrintWriter lastFos = null;
+
+        try {
+            lastFos = new PrintWriter("db/wiseSaying/lastId.txt");
+            lastFos.println(list.get(list.size() - 1).id);
+        } catch ( Exception e ) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
                 lastFos.close();
             } catch ( Exception e ) {
                 System.out.println(e.getMessage());
             }
+        }
+    }
+
+    void fileDelete (int id) {
+        String filePath = "db/wiseSaying/" + id + ".json";
+        Path path = Paths.get(filePath);
+
+        try {
+            Files.delete(path);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 }
