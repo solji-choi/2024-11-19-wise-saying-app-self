@@ -70,6 +70,9 @@ class AppSelf {
                     System.out.println(e.getMessage());
                 }
 
+            } else if (cmd.equals("빌드")) {
+                actionBuild(list);
+
             }
         }
     }
@@ -258,6 +261,38 @@ class AppSelf {
         }
 
         return lastId;
+    }
+
+    void actionBuild(List<WiseSaying> list) {
+        FileOutputStream fos = null;
+        StringBuffer fileWriteContent = new StringBuffer();
+        fileWriteContent.append("[\n");
+        byte[] fileWriteContents = null;
+        for (WiseSaying wiseSaying : list) {
+            fileWriteContent.append("  {\n" +
+                    "    \"id\": " + wiseSaying.id + ",\n" +
+                    "    \"content\": \"" + wiseSaying.content + "\",\n" +
+                    "    \"author\": \"" + wiseSaying.author + "\"\n" +
+                    "  }").append(",\n");
+        }
+        fileWriteContent.deleteCharAt(fileWriteContent.length() - 2).append("]");
+
+        fileWriteContents = fileWriteContent.toString().getBytes();
+
+        try {
+            fos = new FileOutputStream("db/wiseSaying/data.json");
+            fos.write(fileWriteContents);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                fos.close();
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
+        System.out.println("data.json 파일의 내용이 갱신되었습니다.");
     }
 }
 

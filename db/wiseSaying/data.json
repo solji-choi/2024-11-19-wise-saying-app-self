@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "content": "명언1",
+    "author": "박가1"
+  },
+  {
+    "id": 3,
+    "content": "명언3",
+    "author": "작가3"
+  },
+  {
+    "id": 5,
+    "content": "명언 5",
+    "author": "작가 5"
+  },
+  {
+    "id": 6,
+    "content": "명언 6",
+    "author": "작가 6"
+  }
+]
