@@ -1,5 +1,7 @@
 package com.ll;
 
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -33,6 +35,7 @@ class AppSelf {
                 String author = scanner.nextLine();
 
                 list.add(new WiseSaying(id, content, author));
+                fileWrite (list, id);
 
                 System.out.println(id + "번 명언이 등록되었습니다.");
                 id++;
@@ -95,6 +98,8 @@ class AppSelf {
                             System.out.print("작가 : ");
                             String author2 = scanner.nextLine();
                             wiseSaying.setAuthor(author2);
+
+                            fileWrite (list, getId);
                         }
                     }
                 }
@@ -102,6 +107,35 @@ class AppSelf {
 
         } else {
             throw new WiseSayingException("%s할 명언의 id 값을 입력해주세요.".formatted(command));
+        }
+    }
+
+    void fileWrite (List<WiseSaying> list, int id) {
+        FileOutputStream fos = null;
+        PrintWriter lastFos = null;
+        byte[] fileWriteContent = null;
+
+        for(WiseSaying wiseSaying : list) {
+            if (wiseSaying.id == id) {
+                fileWriteContent = wiseSaying.toString().getBytes();
+            }
+        }
+
+
+        try {
+            fos = new FileOutputStream("db/wiseSaying/" + id + ".json");
+            lastFos = new PrintWriter("db/wiseSaying/lastId.txt");
+            fos.write(fileWriteContent);
+            lastFos.println(list.get(list.size() - 1).id);
+        } catch ( Exception e ) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                fos.close();
+                lastFos.close();
+            } catch ( Exception e ) {
+                System.out.println(e.getMessage());
+            }
         }
     }
 }
@@ -122,6 +156,15 @@ class WiseSaying {
 
     void setAuthor (String author) {
         this.author = author;
+    }
+
+    @Override
+    public String toString() {
+        return "{\n" +
+                "  \"id\": " + id + ",\n" +
+                "  \"content\": \"" + content + "\",\n" +
+                "  \"author\": \"" + author + "\"\n" +
+                "}";
     }
 }
 
