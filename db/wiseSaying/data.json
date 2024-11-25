@@ -6,8 +6,8 @@
   },
   {
     "id": 3,
-    "content": "명언3",
-    "author": "작가3"
+    "content": "수정된 명언3",
+    "author": "수정된 작가3"
   },
   {
     "id": 5,
@@ -18,5 +18,20 @@
     "id": 6,
     "content": "명언 6",
     "author": "작가 6"
+  },
+  {
+    "id": 7,
+    "content": "치킨버거는 맛있다",
+    "author": "최재훈"
+  },
+  {
+    "id": 8,
+    "content": "아아",
+    "author": "나나나"
+  },
+  {
+    "id": 9,
+    "content": "나나나",
+    "author": "카캌"
   }
 ]
