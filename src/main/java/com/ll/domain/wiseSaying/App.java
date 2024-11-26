@@ -12,69 +12,49 @@ public class App {
     public void run() {
         System.out.println("=== 명언 앱 ===");
         Scanner scanner = new Scanner(System.in);
-        List<WiseSaying> list = new ArrayList<>();
+        List<WiseSaying> wiseSayingList = new ArrayList<>();
+        WiseSayingController wiseSayingController = new WiseSayingController();
 
-        fileRead(list);
+        fileRead(wiseSayingList);
 
-        int id = readLastId();
+        int lastId = readLastId();
 
         while (true) {
             System.out.print("명령) ");
             String cmd = scanner.nextLine();
-            //System.out.println("입력받은 명령어 : %s".formatted(cmd));
 
             if (cmd.equals("종료")) break;
             else if (cmd.equals("등록")) {
-                System.out.print("명언 : ");
-                String content = scanner.nextLine();
-
-                System.out.print("작가 : ");
-                String author = scanner.nextLine();
-
-                list.add(new WiseSaying(id, content, author));
-                fileWrite(list, id);
-                fileWriteLastId(list, id);
-
-                System.out.println(id + "번 명언이 등록되었습니다.");
-                id++;
+                wiseSayingController.actionAdd(scanner, wiseSayingList, lastId);
             } else if (cmd.equals("목록")) {
-                System.out.println("번호 / 작가 / 명언");
-                System.out.println("----------------------");
-
-                if (list.size() > 0) {
-                    for (int i = list.size() - 1; i >= 0; i--) {
-                        System.out.println("%d / %s / %s".formatted(list.get(i).id, list.get(i).author, list.get(i).content));
-                    }
-                } else {
-                    System.out.println("목록이 없습니다");
-                }
+                wiseSayingController.actionList(wiseSayingList);
             } else if (cmd.startsWith("삭제")) {
                 try {
-                    execute(cmd, list, "삭제", scanner);
+                    execute(cmd, wiseSayingList, "삭제", scanner);
                 } catch (WiseSayingException e) {
                     System.out.println(e.getMessage());
                 }
 
             } else if (cmd.startsWith("수정")) {
                 try {
-                    execute(cmd, list, "수정", scanner);
+                    execute(cmd, wiseSayingList, "수정", scanner);
                 } catch (WiseSayingException e) {
                     System.out.println(e.getMessage());
                 }
 
             } else if (cmd.equals("빌드")) {
-                actionBuild(list);
+                actionBuild(wiseSayingList);
 
             }
         }
     }
 
-    void execute(String cmd, List<WiseSaying> list, String command, Scanner scanner) throws WiseSayingException {
+    void execute(String cmd, List<WiseSaying> wiseSayingList, String command, Scanner scanner) throws WiseSayingException {
         if (cmd.indexOf("?id=") > -1) {
             int getId = Integer.parseInt(cmd.substring(cmd.indexOf("?id=") + 4));
             boolean listChk = false;
 
-            for (WiseSaying wiseSaying : list) {
+            for (WiseSaying wiseSaying : wiseSayingList) {
                 if (wiseSaying.id == getId) {
                     listChk = true;
                 }
@@ -84,14 +64,14 @@ public class App {
                 throw new WiseSayingException("%d번 명언은 존재하지 않습니다.".formatted(getId));
             } else {
                 if (command.equals("삭제")) {
-                    list.removeIf(wiseSaying -> wiseSaying.id == getId);
+                    wiseSayingList.removeIf(wiseSaying -> wiseSaying.id == getId);
                     fileDelete(getId);
-                    fileWriteLastId(list, getId);
+                    //fileWriteLastId(list, getId);
 
                     System.out.println("%d번 명언이 삭제되었습니다.".formatted(getId));
 
                 } else if (command.equals("수정")) {
-                    for (WiseSaying wiseSaying : list) {
+                    for (WiseSaying wiseSaying : wiseSayingList) {
                         if (wiseSaying.id == getId) {
                             System.out.println("명언(기존) : %s".formatted(wiseSaying.content));
                             System.out.print("명언 : ");
@@ -103,8 +83,8 @@ public class App {
                             String author2 = scanner.nextLine();
                             wiseSaying.setAuthor(author2);
 
-                            fileWrite(list, getId);
-                            fileWriteLastId(list, getId);
+                            fileWrite(wiseSayingList, getId);
+                            fileWriteLastId(wiseSayingList, getId);
                         }
                     }
                 }
@@ -115,11 +95,11 @@ public class App {
         }
     }
 
-    void fileWrite(List<WiseSaying> list, int id) {
+    void fileWrite(List<WiseSaying> wiseSayingList, int id) {
         FileOutputStream fos = null;
         byte[] fileWriteContent = null;
 
-        for (WiseSaying wiseSaying : list) {
+        for (WiseSaying wiseSaying : wiseSayingList) {
             if (wiseSaying.id == id) {
                 fileWriteContent = wiseSaying.toString().getBytes();
             }
@@ -139,12 +119,12 @@ public class App {
         }
     }
 
-    void fileWriteLastId(List<WiseSaying> list, int id) {
+    void fileWriteLastId(List<WiseSaying> wiseSayingList, int id) {
         PrintWriter lastFos = null;
 
         try {
             lastFos = new PrintWriter("db/wiseSaying/lastId.txt");
-            lastFos.println(list.get(list.size() - 1).id);
+            lastFos.println(wiseSayingList.get(wiseSayingList.size() - 1).id);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         } finally {
@@ -167,7 +147,7 @@ public class App {
         }
     }
 
-    void fileRead(List<WiseSaying> list) {
+    void fileRead(List<WiseSaying> wiseSayingList) {
         BufferedReader fileReader = null;
         File dbDirectory = new File("db/wiseSaying/");
         File[] dbFiles = dbDirectory.listFiles();
@@ -213,7 +193,7 @@ public class App {
                                 }
 
                                 if (id != 0 && content != null && author != null) {
-                                    list.add(new WiseSaying(id, content, author));
+                                    wiseSayingList.add(new WiseSaying(id, content, author));
                                 }
                             }
                         } else {
@@ -255,12 +235,12 @@ public class App {
         return lastId;
     }
 
-    void actionBuild(List<WiseSaying> list) {
+    void actionBuild(List<WiseSaying> wiseSayingList) {
         FileOutputStream fos = null;
         StringBuffer fileWriteContent = new StringBuffer();
         fileWriteContent.append("[\n");
         byte[] fileWriteContents = null;
-        for (WiseSaying wiseSaying : list) {
+        for (WiseSaying wiseSaying : wiseSayingList) {
             fileWriteContent.append("  {\n" +
                     "    \"id\": " + wiseSaying.id + ",\n" +
                     "    \"content\": \"" + wiseSaying.content + "\",\n" +
@@ -285,44 +265,5 @@ public class App {
         }
 
         System.out.println("data.json 파일의 내용이 갱신되었습니다.");
-    }
-}
-
-class WiseSaying {
-    int id;
-    String content;
-    String author;
-
-    WiseSaying(int id, String content, String author) {
-        this.id = id;
-        this.content = content;
-        this.author = author;
-    }
-
-    void setContent(String content) {
-        this.content = content;
-    }
-
-    void setAuthor(String author) {
-        this.author = author;
-    }
-
-    @Override
-    public String toString() {
-        return "{\n" +
-                "  \"id\": " + id + ",\n" +
-                "  \"content\": \"" + content + "\",\n" +
-                "  \"author\": \"" + author + "\"\n" +
-                "}";
-    }
-}
-
-class WiseSayingException extends RuntimeException {
-    WiseSayingException(String msg) {
-        super(msg);
-    }
-
-    WiseSayingException(Exception ex) {
-        super(ex);
     }
 }
